@@ -1,0 +1,103 @@
+<!DOCTYPE>
+<html>
+<head>
+</head>
+<body>
+
+<script src="/src/aqueduct.js"></script>
+<script src="/src/lib/jquery/dist/jquery.js"></script>
+<script>
+  function magic (cb) {
+    console.log('performing magic');
+    setTimeout(function () {
+      // TODO: pass cb args to yield result
+      console.log('magic done');
+      cb && cb('magic');
+    }, 100);
+
+    return 'magic';
+  }
+
+  var aqueduct = window.aqueduct;
+  var runner1 = aqueduct.run(function* (resume) {
+    yield magic(resume());
+    // yield setTimeout(resume(), 1000);
+    yield runner1.stop();
+    yield magic(resume());
+    console.log('runner 1 done');
+  });
+  // runner1.start();
+  // runner1.stop();
+  var runner2 = aqueduct.run(function* () {
+    yield magic();
+    yield magic();
+    yield magic();
+    console.log('runner 2 done');
+  }, 1000);
+  // runner2.start();
+  // setTimeout(function () {
+  //   runner2.stop();
+  // }, 1000);
+
+  var runner3 = aqueduct.run(function* () {
+    magic();
+    console.log('runner 3 done');
+  }, 1000);
+  runner3.start();
+
+  var runner_wrap = aqueduct.run(function* (resume) {
+    yield runner1.start(resume());
+
+    if (runner2.generator.length === 1) {
+      yield runner2.start(resume());
+    } else {
+      yield runner2.start();
+    }
+  });
+  // runner_wrap.start();
+
+  var conduit = aqueduct.create({
+    interval: 500,
+    // interval: function (i) { return 5000; },
+    startDelay: 0,
+    // comparator: function (priority) { }
+  });
+  // conduit.push(function* (resume) {
+  //   yield magic(resume());
+  //   yield setTimeout(resume(), 1000);
+  //   console.log('job 1 resuming');
+  //   yield magic(resume());
+  //   console.log('job 1 done');
+  // }, 1);
+  conduit.push(function* () {
+    yield magic();
+    // TODO cannot stop between
+    yield magic();
+    yield magic();
+    console.log('job 2 done');
+  }, 2);
+
+  // setTimeout(function () {
+  //   console.log('stopping');
+  //   conduit.stop();
+  // }, 500);
+
+  // conduit.push(function* (resume) {
+  //   magic();
+  //   magic();
+  //   magic();
+  //   console.log('job 3 done');
+  // }, 3);
+  // conduit.push(function* (resume) {
+  //   yield magic();
+  //   yield magic();
+  //   console.log('job 4 done');
+  // }, 2);
+
+  // conduit.start();
+  // conduit.stop();
+
+</script>
+
+</body>
+</html>

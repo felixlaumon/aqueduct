@@ -1,0 +1,21 @@
+{
+  "name": "aqueduct",
+  "version": "0.0.1",
+  "authors": [
+    "Felix Lau <felixlaumon@gmail.com>"
+  ],
+  "description": "TODO",
+  "main": "index.js",
+  "keywords": [
+    "TODO"
+  ],
+  "license": "MIT",
+  "homepage": "TODO",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

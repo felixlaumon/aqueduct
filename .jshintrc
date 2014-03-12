@@ -1,0 +1,24 @@
+{
+  // Enforcing
+  "eqeqeq": true,
+  "strict": true,
+  "undef": true,
+  "quotmark": "single",
+  "noarg": true,
+  "trailing": true,
+  "noempty": true,
+  "latedef": true,
+
+  // Relaxing
+  "expr": true,
+
+  // Environments
+  "esnext": true,
+  "jquery": true,
+  "browser": true,
+  "node": true,
+
+  // Globals
+  "predef": [
+  ]
+}
