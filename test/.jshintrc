@@ -1,0 +1,14 @@
+{
+  // Relaxing
+  "expr": true,
+
+  // Environments
+  "esnext": true,
+
+  // Globals
+  "predef": [
+    "it",
+    "describe",
+    "expect"
+  ]
+}

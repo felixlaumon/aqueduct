@@ -20,6 +20,8 @@
     "gulp-regenerator": "^0.2.0",
     "gulp-traceur": "^0.1.3"
   },
-  "dependencies": {
+  "dependencies": {},
+  "script": {
+    "test": "node --harmony ./node_modules/karma/bin/karma.js start"
   }
 }

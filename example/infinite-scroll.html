@@ -1,0 +1,243 @@
+<!DOCTYPE>
+<html>
+<head>
+  <link rel="stylesheet" href="http://necolas.github.io/normalize.css/3.0.0/normalize.css">
+  <link rel="stylesheet" href="/src/lib/swiper/dist/idangerous.swiper.css">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    .loading {
+      text-align: center;
+      height: 500px;
+    }
+
+    #item-template {
+      display: none;
+    }
+
+    .item {
+      width: 20%;
+      padding: 10px;
+      margin: 10px;
+      border: 1px #dddddd solid;
+      float: left;
+
+      /* Slow styling */
+      border-radius: 2px;
+      box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+      background-image: -webkit-linear-gradient(bottom, #eeeeee, white);
+    }
+
+    .clearfix:before, .clearfix:after { content: ''; display: table; }
+    .clearfix:after { clear: both; }
+
+    .thumbnail {
+      width: 100%;
+      height: 200px;
+      opacity: 0;
+      -webkit-transition: opacity 1s ease;
+      background-size: cover;
+    }
+
+    header {
+      width: 100%;
+      position: fixed;
+      background: #eeeeee;
+      text-align: center;
+      z-index: 5;
+    }
+
+    .stuff {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Infinite scrolling example</h1>
+  <p>Aqueduct mode: <span id="aqueduct-mode"></span></p>
+  <a id="toggle-aqueduct"></a>
+</header>
+
+<div id="item-template">
+  <div class="item">
+    <div class="thumbnail" src="http://lorempixel.com/500/500"></div>
+    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ratione, atque!</p>
+    <div class="stuff"></div>
+  </div>
+</div>
+
+<div id="container" class="clearfix">
+</div>
+
+<h3 class="loading">Loading...</p>
+
+<script src="/src/aqueduct.js"></script>
+<script src="/src/lib/jquery/dist/jquery.js"></script>
+<script src="/src/lib/lodash/dist/lodash.js"></script>
+<script>
+
+function noop () {
+}
+
+function loop (n, iterator, context) {
+  for (var i = 0; i < n; i++) {
+    iterator.call(context, i);
+  }
+}
+
+function freeze (ms) {
+  var start = Date.now();
+  while (Date.now() - start < ms) {
+  }
+}
+
+function wait (ms) {
+  return function (cb) {
+    setTimeout(cb, ms);
+  }
+}
+
+var mode = '';
+if (location.search.indexOf('aqueduct') >= 0) {
+  console.log('aqueduct enabled');
+  mode = 'aqueduct';
+  $('#aqueduct-mode').text('enabled');
+  $('#toggle-aqueduct').text('Disable Aqueduct').attr('href', './infinite-scroll.html');
+} else {
+  console.log('aqueduct disabled');
+  $('#aqueduct-mode').text('disabled');
+  $('#toggle-aqueduct').text('Enable Aqueduct').attr('href', './infinite-scroll.html?aqueduct');
+}
+
+var n = 20;
+var itemTemplate = $('#item-template').html();
+var aqueduct = window.aqueduct;
+var $container = $('#container');
+var conduit = aqueduct.create({
+  interval: 5,
+  runnerInterval: 0,
+  startDelay: 0
+});
+
+function Item () {
+  // Let's parse the HTML again and again ...
+  this.$el = $(itemTemplate);
+}
+
+var count = 0;
+Item.prototype.preload = function (cb) {
+  console.log('preloading');
+  this.$img = this.$el.find('.thumbnail');
+  this.src = this.$img.attr('src') + '?' + count++;
+  src = this.$img.attr('src', '');
+  var img = new Image();
+  img.src = this.src;
+  img.onload = cb;
+};
+
+Item.prototype.fadeInG = function* () {
+  console.log('fading in');
+  this.$img.css('background-image', 'url(' + this.src + ')');
+  yield wait(1);
+  this.$img.css('opacity', 1);
+};
+
+Item.prototype.fadeIn = function () {
+  console.log('fading in');
+  this.$img.css('background-image', 'url(' + this.src + ')');
+  setTimeout(function () {
+    this.$img.css('opacity', 1);
+  }.bind(this));
+};
+
+Item.prototype.load = function (cb) {
+  setTimeout(function () {
+    freeze(25);
+    cb();
+  }, 1);
+};
+
+Item.prototype.loadG = function* (resume) {
+  yield wait(1);
+  yield freeze(25);
+};
+
+Item.prototype.render = function () {
+  return this.$el;
+};
+
+var buffer = 25;
+var atBottom = false;
+function scrollBottomDetector (e) {
+  var maxScrollY = window.document.body.scrollHeight - window.innerHeight;
+  if (window.scrollY > (maxScrollY - buffer)) {
+    if (!atBottom) {
+      atBottom = true;
+      console.log('scrolled to bottom');
+
+      if (mode === 'aqueduct') {
+        conduit.push(appendItemG);
+      } else {
+        appendItem();
+      }
+    }
+  } else {
+    atBottom = false;
+  }
+}
+
+var isScolling = false;
+function scrollDetector () {
+  if (!isScolling) {
+    isScolling = true;
+    console.log('scroll start');
+    conduit.stop();
+  }
+  scrollEnd();
+}
+
+var scrollEnd = _.debounce(function () {
+  isScolling = false;
+  console.log('scroll end');
+  conduit.start();
+}, 300);
+
+$(window).scroll(_.throttle(scrollBottomDetector, 50));
+$(window).scroll(_.throttle(scrollDetector, 50));
+
+function* appendItemG (resume) {
+  for (var i=0; i < n; i++) {
+    var item = new Item();
+    $container.append(item.render());
+    yield item.loadG();
+    yield item.preload.call(item);
+    yield item.fadeInG.call(item);
+  }
+}
+
+function appendItem () {
+  loop(n, function () {
+    var item = new Item();
+    $container.append(item.render());
+    item.load(function () {
+      item.preload(function () {
+        item.fadeIn();
+      });
+    });
+  });
+}
+
+appendItem();
+
+setTimeout(function () {
+  window.scrollTo(0, 0);
+}, 1);
+
+</script>
+
+</body>
+</html>

@@ -55,11 +55,16 @@ Another example is to improve responsiveness of slider-based web page. When the 
 
 Since `aqueduct` relies on generator, you will have to transpile your ES6 code by something like [Traceur](https://github.com/google/traceur-compiler) and [regenerator](https://github.com/facebook/regenerator).
 
-## Reference
+## Todo
+
+- Test with delegate yield
+- Compatibility with thunk-style callback
+
+## Reference and related projects
 
 - http://kangax.github.io/es5-compat-table/es6/#Generators_(yield)
+- http://airbnb.github.io/infinity/
 
 ## License
 
 MIT
-

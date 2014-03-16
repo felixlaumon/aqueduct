@@ -18,6 +18,12 @@
     return 'magic';
   }
 
+  function* magicg (resume) {
+    console.log('performing magic');
+    yield setTimeout(resume(), 10);
+    console.log('magic done');
+  }
+
   var aqueduct = window.aqueduct;
   var runner1 = aqueduct.run(function* (resume) {
     yield magic(resume());
@@ -39,8 +45,12 @@
   //   runner2.stop();
   // }, 1000);
 
-  var runner3 = aqueduct.run(function* () {
-    magic();
+  var runner3 = aqueduct.run(function* (resume) {
+    console.log('runner 3 start');
+    // yield aqueduct.run(magicg).start(resume());
+    // yield aqueduct.run(magicg).start(resume());
+    yield magicg;
+    yield magicg;
     console.log('runner 3 done');
   }, 1000);
   runner3.start();
