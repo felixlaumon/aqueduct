@@ -1,10 +1,13 @@
+/**
+ * aqueudct - ES6 generated-based job queue / job runner for the browser
+ * @author Felix Lau <felixlaumon@gmail.com>
+*/
+
 (function () {
 
 'use strict';
 
 var aqueduct = {};
-
-// TODO test on iPad
 
 aqueduct.run = function (generator, interval) {
   // TODO normalize normal function to generator
@@ -173,8 +176,18 @@ function isGeneratorFunction(obj) {
   return obj && obj.constructor && 'GeneratorFunction' === obj.constructor.name;
 }
 
-window.aqueduct = aqueduct;
-window.aqueduct.Runner = Runner;
-window.aqueduct.Conduit = Conduit;
+aqueduct.Runner = Runner;
+aqueduct.Conduit = Conduit;
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = aqueduct;
+} else if (typeof define === 'function' && define.amd) {
+  define(function() {
+    return aqueduct;
+  });
+} else {
+  /*jshint -W069 */
+  window['aqueduct'] = aqueduct;
+}
 
 })();

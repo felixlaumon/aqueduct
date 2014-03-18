@@ -1,13 +1,22 @@
 'use strict';
 
 var gulp = require('gulp');
-var concat = require('gulp-concat');
 var regenerator = require('gulp-regenerator');
-var traceur = require('gulp-traceur');
-var traceur_runtime = 'node_modules/gulp-traceur/node_modules/traceur/bin/traceur-runtime.js';
+var rename = require('gulp-rename');
 
-gulp.task('regenerator', function () {
+// TODO generate alt version without the runtime
+gulp.task('default', function () {
   gulp.src('src/aqueduct.js')
-    .pipe(regenerator())
+    .pipe(regenerator({
+      includeRuntime: true
+    }))
+    .pipe(rename('index.js'))
     .pipe(gulp.dest('./'));
+});
+
+gulp.task('example', function () {
+  gulp.src('example/infinite-scroll.js')
+    .pipe(regenerator())
+    .pipe(rename('infinite-scroll-transpiled.js'))
+    .pipe(gulp.dest('example'));
 });

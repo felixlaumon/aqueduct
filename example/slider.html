@@ -2,7 +2,7 @@
 <html>
 <head>
   <link rel="stylesheet" href="http://necolas.github.io/normalize.css/3.0.0/normalize.css">
-  <link rel="stylesheet" href="/src/lib/swiper/dist/idangerous.swiper.css">
+  <link rel="stylesheet" href="http://www.idangero.us/sliders/swiper/css/idangerous.swiper.css">
   <style>
     #container {
       position: absolute;
@@ -56,21 +56,15 @@
   </div>
 </div>
 
+<script src="//code.jquery.com/jquery-2.1.0.js"></script>
+<script src="//www.idangero.us/sliders/swiper/js/idangerous.swiper.js"></script>
+
 <script src="/src/aqueduct.js"></script>
-<script src="/src/lib/jquery/dist/jquery.js"></script>
-<script src="/src/lib/swiper/dist/idangerous.swiper.js"></script>
+<script src="/index.js"></script>
 <script>
   var aqueduct = window.aqueduct;
 
   var count = 0;
-  // function prepend () {
-  //   var $div = $('<div>' + count++ + '</div>');
-  //   for (var i = 0; i < 100; i++) {
-  //     // $div.append('<img src="http://i.imgur.com/nQ0oRxT.gif">');
-  //     $div.append('<div></div>');
-  //   }
-  //   $('.content').prepend($div);
-  // }
 
   function freeze (time) {
     console.log('freeze start');
@@ -78,14 +72,6 @@
     while (Date.now() - start <= time) {
     }
     console.log('freeze end');
-  }
-
-  function appendSlide () {
-    var newSlide = swiper.createSlide('<p>Slide ' + ++count + '</p>');
-    newSlide.append();
-
-    var firstSlide = swiper.getFirstSlide();
-    firstSlide.remove();
   }
 
   var conduit = aqueduct.create({
@@ -112,8 +98,6 @@
     });
     conduit.start();
   }, true);
-
-  // TODO: change to append to DOM on page change
 </script>
 
 </body>

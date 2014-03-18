@@ -20,5 +20,6 @@
 
   // Globals
   "predef": [
+    "define"
   ]
 }

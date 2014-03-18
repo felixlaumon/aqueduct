@@ -2,7 +2,7 @@
 
 > ES6 generated-based job queue / job runner for the browser
 
-**Work in Progress**
+**Experimental**
 
 ## Usage
 
@@ -43,9 +43,9 @@ An advantage of using `aqueduct` over `setTimeout`-based solution is that, you c
 
 ## Use cases
 
-One real world use case scenario is to loading heavy content in an infinite scrolling web page. To prevent janky scrolling, use `conduit.push()` to append the items to the DOM, and call `conduit.pause()` to when the user starts scrolling. But of course, you should try to optimize with the techniques in http://jankfree.org/ first.
+One real world use case scenario is to loading heavy content in an infinite scrolling web page. To prevent janky scrolling, use `conduit.push()` to append the items to the DOM, and call `conduit.pause()` to when the user starts scrolling. But of course, you should try to optimize with the techniques in http://jankfree.org/ first. (See `example/infinite-scroll.html`)
 
-Another example is to improve responsiveness of slider-based web page. When the user starts touching the slider, pause all other slow functions by `conduit.pause` to make sure touch events can be emitted 60 FPS.
+Another example is to improve responsiveness of slider-based web page. When the user starts touching the slider, pause all other slow functions by `conduit.pause` to make sure touch events can be emitted 60 FPS. (See `example/slider.html`)
 
 ## API
 
@@ -55,19 +55,26 @@ Another example is to improve responsiveness of slider-based web page. When the 
 
 Since `aqueduct` relies on generator, you will have to transpile your ES6 code by something like [Traceur](https://github.com/google/traceur-compiler) and [regenerator](https://github.com/facebook/regenerator).
 
+`aqueduct` is transpiled as `index.js` with [regenerator](https://github.com/facebook/regenerator) with the [runtime](https://github.com/facebook/regenerator/blob/master/runtime/dev.js). You might to use the source file in `src/aqueduct.js` and pass everthing through the transpiler instead.
+
 ## Todo
 
 - Test with delegate yield
-- Compatibility with thunk-style callback
+- Test compatibility with thunk-style callback
+- Change start() to return thunk-style callback
 
 ## Test
 
-- Requires the harmony branch of Istanbul
+- Use Karma
+- Require the harmony branch of Istanbul for code coverage
+- Travis integration
 
 ## Reference and related projects
 
 - http://kangax.github.io/es5-compat-table/es6/#Generators_(yield)
 - http://airbnb.github.io/infinity/
+- https://github.com/visionmedia/co
+- https://gist.github.com/creationix/5762837
 
 ## License
 

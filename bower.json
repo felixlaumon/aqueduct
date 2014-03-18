@@ -4,10 +4,12 @@
   "authors": [
     "Felix Lau <felixlaumon@gmail.com>"
   ],
-  "description": "TODO",
+  "description": "ES6 generated-based job queue / job runner for the browser",
   "main": "index.js",
   "keywords": [
-    "TODO"
+    "generator",
+    "job queue",
+    "job runner"
   ],
   "license": "MIT",
   "homepage": "TODO",
