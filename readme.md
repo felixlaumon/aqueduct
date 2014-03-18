@@ -60,6 +60,10 @@ Since `aqueduct` relies on generator, you will have to transpile your ES6 code b
 - Test with delegate yield
 - Compatibility with thunk-style callback
 
+## Test
+
+- Requires the harmony branch of Istanbul
+
 ## Reference and related projects
 
 - http://kangax.github.io/es5-compat-table/es6/#Generators_(yield)

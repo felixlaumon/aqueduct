@@ -54,6 +54,7 @@ module.exports = function(config) {
     customLaunchers: {
       ChromeCanaryExp: {
         base: 'ChromeCanary',
+        // TODO the flags don't work
         flags: ['--enable-experimental-web-platform-features --js-flags="--harmony"']
       }
     },
