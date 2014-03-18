@@ -1,0 +1,130 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Aqueduct by felixlaumon</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Aqueduct</h1>
+        <p>ES6 generated-based job queue / job runner for the browser</p>
+
+        <p class="view"><a href="https://github.com/felixlaumon/aqueduct">View the Project on GitHub <small>felixlaumon/aqueduct</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/felixlaumon/aqueduct/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/felixlaumon/aqueduct/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/felixlaumon/aqueduct">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="aqueduct" class="anchor" href="#aqueduct"><span class="octicon octicon-link"></span></a>aqueduct</h1>
+
+<blockquote>
+<p>ES6 generated-based job queue / job runner for the browser</p>
+</blockquote>
+
+<p><strong>Experimental</strong></p>
+
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>Say you've got a slow function (&gt;250ms, e.g. heavy DOM manipulation etc), but you don't want to freeze up the browser to retain responsiveness. One way to achieve this is to break the function up into smaller chunks, and run them bit by bit by <code>setTimeout</code>.</p>
+
+<div class="highlight highlight-js"><pre><span class="kd">function</span> <span class="nx">slowOperation</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// Some work here. ..</span>
+  <span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span> <span class="nx">part1</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// Some more work here ...</span>
+    <span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span> <span class="nx">part2</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="c1">// Some more work here ...</span>
+      <span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span> <span class="nx">part3</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="c1">// Even some more work here ...</span>
+      <span class="p">},</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="p">},</span> <span class="mi">100</span><span class="p">)</span>
+  <span class="p">},</span> <span class="mi">100</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>With <code>aqueduct</code>, you can write the following without splitting up your function and wrapping them in <code>function () {}</code>.</p>
+
+<div class="highlight highlight-js"><pre><span class="kd">var</span> <span class="nx">conduit</span> <span class="o">=</span> <span class="nx">aqueduct</span><span class="p">.</span><span class="nx">create</span><span class="p">({</span>
+  <span class="nx">interval</span><span class="o">:</span> <span class="mi">100</span><span class="p">,</span>
+<span class="p">});</span>
+<span class="nx">conduit</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="kd">function</span><span class="o">*</span> <span class="nx">slowOperation</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="k">yield</span> <span class="nx">part1</span><span class="p">();</span>
+  <span class="k">yield</span> <span class="nx">part2</span><span class="p">();</span>
+  <span class="k">yield</span> <span class="nx">part3</span><span class="p">();</span>
+<span class="p">});</span>
+<span class="nx">conduit</span><span class="p">.</span><span class="nx">start</span><span class="p">();</span>
+</pre></div>
+
+<p>In this example, <code>part2</code> will be executed after 100ms after <code>part1</code> is completed.</p>
+
+<p>An advantage of using <code>aqueduct</code> over <code>setTimeout</code>-based solution is that, you can <strong>pause</strong> the slow function by <code>conduit.stop()</code> and resume later <code>conduit.start()</code>, if you want to prioritize other processing.</p>
+
+<h2>
+<a name="use-cases" class="anchor" href="#use-cases"><span class="octicon octicon-link"></span></a>Use cases</h2>
+
+<p>One real world use case scenario is to loading heavy content in an infinite scrolling web page. To prevent janky scrolling, use <code>conduit.push()</code> to append the items to the DOM, and call <code>conduit.pause()</code> to when the user starts scrolling. But of course, you should try to optimize with the techniques in <a href="http://jankfree.org/">http://jankfree.org/</a> first. (See <code>example/infinite-scroll.html</code>)</p>
+
+<p>Another example is to improve responsiveness of slider-based web page. When the user starts touching the slider, pause all other slow functions by <code>conduit.pause</code> to make sure touch events can be emitted 60 FPS. (See <code>example/slider.html</code>)</p>
+
+<h2>
+<a name="api" class="anchor" href="#api"><span class="octicon octicon-link"></span></a>API</h2>
+
+<p>...</p>
+
+<h2>
+<a name="limitation" class="anchor" href="#limitation"><span class="octicon octicon-link"></span></a>Limitation</h2>
+
+<p>Since <code>aqueduct</code> relies on generator, you will have to transpile your ES6 code by something like <a href="https://github.com/google/traceur-compiler">Traceur</a> and <a href="https://github.com/facebook/regenerator">regenerator</a>.</p>
+
+<p><code>aqueduct</code> is transpiled as <code>index.js</code> with <a href="https://github.com/facebook/regenerator">regenerator</a> with the <a href="https://github.com/facebook/regenerator/blob/master/runtime/dev.js">runtime</a>. You might to use the source file in <code>src/aqueduct.js</code> and pass everthing through the transpiler instead.</p>
+
+<h2>
+<a name="todo" class="anchor" href="#todo"><span class="octicon octicon-link"></span></a>Todo</h2>
+
+<ul>
+<li>Test with delegate yield</li>
+<li>Test compatibility with thunk-style callback</li>
+<li>Change start() to return thunk-style callback</li>
+</ul><h2>
+<a name="test" class="anchor" href="#test"><span class="octicon octicon-link"></span></a>Test</h2>
+
+<ul>
+<li>Use Karma</li>
+<li>Require the harmony branch of Istanbul for code coverage</li>
+<li>Travis integration</li>
+</ul><h2>
+<a name="reference-and-related-projects" class="anchor" href="#reference-and-related-projects"><span class="octicon octicon-link"></span></a>Reference and related projects</h2>
+
+<ul>
+<li><a href="http://kangax.github.io/es5-compat-table/es6/#Generators_(yield)">http://kangax.github.io/es5-compat-table/es6/#Generators_(yield)</a></li>
+<li><a href="http://airbnb.github.io/infinity/">http://airbnb.github.io/infinity/</a></li>
+<li><a href="https://github.com/visionmedia/co">https://github.com/visionmedia/co</a></li>
+<li><a href="https://gist.github.com/creationix/5762837">https://gist.github.com/creationix/5762837</a></li>
+</ul><h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>MIT</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/felixlaumon">felixlaumon</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
